@@ -27,6 +27,10 @@ export default {
 
         clickPlus(event) {
             this.$store.commit(types.HANDEL_COUNT_NEW, event.target.tagName)
+        },
+        // 切换主题
+        onThemeChange: function (themeColor) {
+            this.$store.commit('setThemeColor', themeColor)
         }
     }
 }

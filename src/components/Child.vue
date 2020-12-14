@@ -15,10 +15,9 @@
             }
         },
         methods : {
-            getText() {
-                console.log(1111)
-                this.$emit("message", this.msg)
-            }
+            // getText() {
+            //     this.$emit("message", this.msg)
+            // }
         }
     }
 </script>

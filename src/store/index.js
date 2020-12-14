@@ -5,6 +5,7 @@ import getters from './getters'
 import mutations from './mutations'
 import state from './state'
 import my from './modules/my'
+import app from './modules/app'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
     mutations,
     state,
     modules: {
-        my
+        my,
+        app
     }
 })
