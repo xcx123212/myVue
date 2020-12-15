@@ -81,10 +81,10 @@
                 // 响应外部操作
                 this.$emit('onThemeChange', val)
                 if (this.showSuccess) {
-                    this.$message({
-                        message: '换肤成功',
-                        type: 'success'
-                    })
+                    // this.$message({
+                    //     message: '换肤成功',
+                    //     type: 'success'
+                    // })
                 } else {
                     this.showSuccess = true
                 }

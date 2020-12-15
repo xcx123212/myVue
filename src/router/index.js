@@ -12,10 +12,22 @@ export default new Router({
       component: HelloWorld
     },
     {
-      path: '/',
+      path: '/index',
       name: 'index',
       // webpack动态import语法
       component: () => import('@/pages/Index')
+    },
+    {
+      path: '/',
+      name: 'login',
+      // webpack动态import语法
+      component: ()=>import('@/pages/Login')
+    },
+    {
+      path: '/home',
+      name: 'home',
+      // webpack动态import语法
+      component: ()=>import('@/pages/Home')
     }
   ]
 })

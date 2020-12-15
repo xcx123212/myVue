@@ -70,7 +70,7 @@
                 inputVal: '',
                 msgVal: '',
                 show: true,
-                color: '#ffff00'
+                color: 'blue'
             }
         },
         computed: {

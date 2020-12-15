@@ -1,145 +1,111 @@
 <template>
-    <div>
-        <el-form
-                :model="loginForm"
-                :rules="fieldRules"
-                ref="loginForm"
-                label-position="left"
-                label-width="0px"
-                class="demo-ruleForm login-container">
-                <span class="tool-bar">
-                     <theme-picker
-                             style="float:right;"
-                             class="theme-picker"
-                             :default="themeColor"
-                             @onThemeChange="onThemeChange">
-                    </theme-picker>
-            </span>
-            <h2 class="title" style="padding-left:22px;">系统登录</h2>
-            <el-form-item prop="account">
-                <el-input type="text" v-model="loginForm.account" auto-complete="off" placeholder="账号"></el-input>
+    <div class="login-container">
+        <el-form :model="ruleForm" :rules="rules"
+                 status-icon
+                 ref="ruleForm"
+                 label-position="left"
+                 label-width="0px"
+                 class="demo-ruleForm login-page">
+            <h3 class="title">系统登录</h3>
+            <theme-picker
+                    style="float: right;margin-top: -45px;"
+                    class="theme-picker"
+                    :default="themeColor"
+                    @onThemeChange="onThemeChange">
+            </theme-picker>
+            <el-form-item prop="username">
+                <el-input type="text"
+                          v-model="ruleForm.username"
+                          auto-complete="off"
+                          placeholder="用户名"
+                ></el-input>
             </el-form-item>
             <el-form-item prop="password">
-                <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"
-                          @keyup.enter.native="login"></el-input>
+                <el-input type="password"
+                          v-model="ruleForm.password"
+                          auto-complete="off"
+                          placeholder="密码"
+                ></el-input>
             </el-form-item>
+            <el-checkbox
+                    v-model="checked"
+                    class="rememberme">
+                记住密码
+            </el-checkbox>
             <el-form-item style="width:100%;">
-                <el-button type="primary" style="width:48%;" @click.native.prevent="reset">重 置</el-button>
-                <el-button type="primary" style="width:48%;" @click.native.prevent="login" :loading="loading">登 录
-                </el-button>
+                <el-button type="primary" style="width:100%;" @click="handleSubmit" :loading="logining">登录</el-button>
             </el-form-item>
         </el-form>
-
     </div>
 </template>
 
 <script>
-    import {mapState} from 'vuex'
-    import Cookies from "js-cookie"
-    import ThemePicker from "@/components/ThemePicker"
-    import LangSelector from "@/components/LangSelector"
-
+    import ThemePicker from "../components/ThemePicker"
     export default {
-        name: 'Login',
-        components: {
-            ThemePicker,
-            LangSelector
-        },
-        data() {
+        data(){
             return {
-                loading: false,
-                loginForm: {
-                    account: '',
-                    password: '',
-                    captcha: '',
-                    src: ''
+                logining: false,
+                ruleForm: {
+                    username: 'admin',
+                    password: '123456',
                 },
-                fieldRules: {
-                    account: [
-                        {required: true, message: '请输入账号', trigger: 'blur'}
-                    ],
-                    password: [
-                        {required: true, message: '请输入密码', trigger: 'blur'}
-                    ]
+                rules: {
+                    username: [{required: true, message: 'please enter your account', trigger: 'blur'}],
+                    password: [{required: true, message: 'enter your password', trigger: 'blur'}]
                 },
-                checked: true,
-                dialogImageUrl: '',
-                dialogVisible: false
+                checked: false,
+                themeColor: '#f7378b'
             }
+        },
+        components: {
+            ThemePicker
         },
         methods: {
-
-            login() {
-                this.loading = true
-                let userInfo = {
-                    account: this.loginForm.account,
-                    password: this.loginForm.password,
-                    captcha: this.loginForm.captcha
-                }
-                this.$api.login.login(userInfo).then((res) => {
-                    console.log(res, 87)
-                    this.loading = false
-                    if (res.msg != null) {
-                        this.$message({
-                            message: res.msg,
-                            type: 'error'
-                        })
-                    } else {
-                        Cookies.set('token', res.data.info.token) // 放置token到Cookie
-                        sessionStorage.setItem('branchId', res.data.branchId)
-                        sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
-                        this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
-                        this.$router.push('/')  // 登录成功，跳转到主页
+            handleSubmit(event){
+                this.$refs.ruleForm.validate((valid) => {
+                    if(valid){
+                        this.logining = true;
+                        if(this.ruleForm.username === 'admin' &&
+                            this.ruleForm.password === '123456'){
+                            this.logining = false;
+                            sessionStorage.setItem('user', this.ruleForm.username);
+                            this.$router.push({path: '/home'});
+                        }else{
+                            this.logining = false;
+                            this.$alert('username or password wrong!', 'info', {
+                                confirmButtonText: 'ok'
+                            })
+                        }
+                    }else{
+                        console.log('error submit!');
+                        return false;
                     }
-                }).catch((res) => {
-                    this.$message({
-                        message: res.message,
-                        type: 'error'
-                    })
-                });
+                })
             },
-            refreshCaptcha: function () {
-                this.loginForm.src = this.global.webUrl + "/captcha.jpg?t=" + new Date().getTime();
-            },
-            reset() {
-                this.$refs.loginForm.resetFields()
-                this.loading = false
-            },
-            // 切换主题
-            onThemeChange: function (themeColor) {
+            onThemeChange(themeColor) {
                 this.$store.commit('setThemeColor', themeColor)
             }
-        },
-        mounted() {
-            this.refreshCaptcha()
-        },
-        computed: {
-            ...mapState({
-                themeColor: state => state.app.themeColor
-            })
         }
-    }
+    };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
     .login-container {
+        width: 100%;
+        height: 100%;
+    }
+    .login-page {
         -webkit-border-radius: 5px;
         border-radius: 5px;
-        -moz-border-radius: 5px;
-        background-clip: padding-box;
-        margin: 100px auto;
+        margin: 180px auto;
         width: 350px;
-        padding: 35px 35px 15px 35px;
+        padding: 35px 35px 15px;
         background: #fff;
         border: 1px solid #eaeaea;
         box-shadow: 0 0 25px #cac6c6;
-        .title {
-            margin: 0px auto 40px auto;
-            text-align: center;
-            color: #505458;
-        }
-        .remember {
-            margin: 0px 0px 35px 0px;
-        }
+    }
+    label.el-checkbox.rememberme {
+        margin: 0px 0px 15px;
+        text-align: left;
     }
 </style>
